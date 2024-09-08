@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "datain"
+version = "0.1.0"
+description = ""
+authors = ["Mariano Ferro <ferro.mariano@gmail.com>"]
+readme = "README.md"
+packages = [{ include = "**/*" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+ccxt = "^4.3.98"
+websockets = "^13.0.1"
+websocket = "^0.2.1"
+binance-futures-connector = "^4.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
