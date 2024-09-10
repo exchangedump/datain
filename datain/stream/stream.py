@@ -101,15 +101,18 @@ class Stream:
         self.logger.info("_subscribe_pending")
         if self.running:
             for key in self.subscriptions.keys():
-                self.client.subscribe(key)
+                if not self.subscriptions[key]['status']:
+                    self.client.subscribe(key)
 
     def _subscribe_callback(self, key, data):
         self.logger.info(f"_subscribe_callback {key}")
         self.logger.debug(data)
         if key in self.subscriptions:
             for id in self.subscriptions[key]['callbacks'].keys():
-                self.logger.debug(self.subscriptions[key]['callbacks'][id].__name__ )
-                self.subscriptions[key]['callbacks'][id](data)
+                _call = self.subscriptions[key]['callbacks'][id]
+                self.logger.info(_call.__name__ )
+                tmp = _call(data)
+                print(tmp )
 
 
     def subscribe(self, key, callback, id=None):
@@ -134,6 +137,8 @@ class Stream:
         self.subscriptions[key]['callbacks'][id] = callback
         
         self.logger.info(f"Subscribed to end {key} => {id}")
+        
+        self._subscribe_pending()
         
         return id
         
