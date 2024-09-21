@@ -12,6 +12,10 @@ ccxt = "^4.3.98"
 websockets = "^13.0.1"
 websocket = "^0.2.1"
 binance-futures-connector = "^4.0.0"
+uvicorn = "^0.30.6"
+fastapi = "^0.114.0"
+rich = "^13.8.0"
+poetry-dotenv = "^0.4.0"
 
 
 [build-system]
