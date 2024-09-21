@@ -4,6 +4,7 @@ from rich.console import Console
 from datain.stream.stream import Stream
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 from datain.wsOutput.wsControl import wsControl
 
@@ -21,7 +22,7 @@ console.clear()
 if __name__ == "__main__":
     
     _Stream = Stream()
-    #_Stream.start()
+    # _Stream.start()
     
     _wsControl = wsControl(_Stream)
     
@@ -35,6 +36,8 @@ if __name__ == "__main__":
 
     # Crear una instancia de FastAPI
     app = FastAPI()
+    app.mount('/static', StaticFiles(directory='datain/webServer/static', html=True), name='static')
+
 
     # Registrar las rutas definidas en la clase ChatBotAPI
     app.include_router(_subscribeWebServer.get_router())

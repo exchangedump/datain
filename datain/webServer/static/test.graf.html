@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>client - WebSocket</title>
+        <link href="/static/vendors/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+    </style>
+    </head>
+    <body>
+        <section>
+            <header class="navbar sticky-top bg-dark flex-md-nowrap p-0 shadow" data-bs-theme="dark">
+                <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 text-white" href="#">Company name</a>
+                <ul class="navbar-nav flex-row d-md-none">
+                    <li class="nav-item text-nowrap">
+                        <button class="nav-link px-3 text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSearch" aria-controls="navbarSearch" aria-expanded="false" aria-label="Toggle search">
+                            <svg class="bi"><use xlink:href="#search"/></svg>
+                        </button>
+                    </li>
+                    <li class="nav-item text-nowrap">
+                        <button class="nav-link px-3 text-white" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                            <svg class="bi"><use xlink:href="#list"/></svg>
+                        </button>   
+                    </li>
+                </ul>
+                <div id="navbarSearch" class="navbar-search w-100 collapse">
+                    <input class="form-control w-100 rounded-0 border-0" type="text" placeholder="Search" aria-label="Search">
+                </div>
+            </header>
+
+            <div class="container-fluid">
+                <div class="row">
+                    <aside class="col-md-3 col-lg-2">
+                        <div class="accordion accordion-flush" id="accordionAside">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseControl" aria-expanded="false" aria-controls="flush-collapseControl">Control</button></h2>
+                                <div id="flush-collapseControl" class="accordion-collapse collapse" data-bs-parent="#accordionAside">
+                                    <div class="accordion-body">
+                                        <ul>
+                                            <li><a class="btn-send" data-href="/control/start" href="#">Start</a></li>
+                                            <li><a class="btn-send" data-href="/control/stop" href="#">Stop</a></li>
+                                        <ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-suscripciones" aria-expanded="false" aria-controls="flush-suscripciones">Accordion Item #2</button></h2>
+                                <div id="flush-suscripciones" class="accordion-collapse collapse" data-bs-parent="#accordionAside">
+                                    <div class="accordion-body">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-xxxxx" aria-expanded="false" aria-controls="flush-xxxxx">Accordion Item #2</button></h2>
+                                <div id="flush-xxxxx" class="accordion-collapse collapse" data-bs-parent="#accordionAside">
+                                    <div class="accordion-body">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </aside>
+                    <main class="col-md-9 col-lg-10">
+                        <div id="graf" style="min-height: 650px; background-color: #f00;"></div>
+                    </main>
+                </div>
+            </div>
+
+        </section>bootstrap.min.js
+
+        <script src="/static/vendors/bootstrap/js/bootstrap.min.js"></script>
+        <script src="/static/vendors/jquery/jquery.min.js"></script>
+        <script type="text/javascript" src="/static/vendors/echarts/echarts.min.js"></script>
+        <script type="text/javascript" src="/static/js/graf.js"></script>
+
+<script>
+var grafObj;
+var __data=[
+  {
+    't': "2004-01-02",
+    'o': 1,
+    'c': 3,
+    'l': 0.5,
+    'h': 3.5,
+    'v': 168,
+    'x': true,
+  },
+  {
+    't': "2004-01-05",
+    'o': 3,
+    'c': 5,
+    'l': 2.5,
+    'h': 5.5,
+    'v': 221,
+    'x': true,
+  },
+  {
+    't': "2004-01-06",
+    'o': 5,
+    'c': 4,
+    'l': 3.5,
+    'h': 5.5,
+    'v': 191,
+  },
+  {
+    't': "2004-01-07",
+    'o': 5,
+    'c': 4,
+    'l': 3.5,
+    'h': 5.5,
+    'v': 191,
+  },
+  {
+    't': "2004-01-08",
+    'o': 5,
+    'c': 4,
+    'l': 3.5,
+    'h': 5.5,
+    'v': 191,
+  },
+  {
+    't': "2004-01-09",
+    'o': 5,
+    'c': 4,
+    'l': 3.5,
+    'h': 5.5,
+    'v': 191,
+  },
+];
+
+var __data2=[
+    {
+    "lastUpdateId": 1027024,
+    "E": 1589436922972,   // Message output time
+    "t": "2004-01-06",   // Transaction time
+    "bids": [
+        [ "4.2", "10" ],
+        [ "4.1", "26" ],
+        [ "4", "35" ],
+    ],
+    "asks": [
+        [ "3.9", "50"],
+        [ "3.8", "61"],
+        [ "3.7", "70"],
+        [ "1", "80"],
+    ]
+    }
+];
+
+const kline_stream_tranform = {
+    utils_filter_cols:function(_cols, _data){
+        let rs = [];
+        for(let i=0; i<_data.length; i++){
+            let _row = [];
+            for(let j=0; j<_cols.length; j++){
+                _row.push(_data[i][_cols[j]]);
+            }
+            rs.push(_row);
+        }
+        return rs;
+    },
+    kline:{
+        type: 'kline_stream:kline',
+        transform: function(params){
+            let data = kline_stream_tranform.utils_filter_cols( ["t","o","c","h","l"], params.upstream.cloneRawData() )
+            console.log(data);
+            return [{
+                dimensions: ["t","o","c","h","l"],
+                data
+            }];
+        }
+    },
+    volume:{
+        type: 'kline_stream:volume',
+        transform: function(params){
+            let data = kline_stream_tranform.utils_filter_cols( ["t","v"], params.upstream.cloneRawData() )
+            console.log(data);
+            return [{
+                dimensions: ["t","v"],
+                data
+            }];
+        }
+    },
+    trades:{
+        type: 'kline_stream:trades',
+        transform: function(params){
+            let data = kline_stream_tranform.utils_filter_cols( ["t","f", "L", "n"], params.upstream.cloneRawData() )
+            console.log(data);
+            return [{
+                dimensions: ["t","f", "L", "n"],
+                data
+            }];
+        }
+    }
+
+};
+
+function tooltip_formating(params) {
+    rs = [];
+    let color = null
+    for (let index = 0; index < params.length; index++) {
+        let element = params[index];
+
+        if(element.componentSubType == "candlestick") {
+
+            if(element.data[1] > element.data[2]) color='#FF0000';
+            else if(element.data[1] < element.data[2]) color='#00FF00';
+
+            rs.push([
+                'Low: ' + element.data[3],
+                'Open: ' + element.data[1],
+                'Close: ' + element.data[2],
+                'High: ' + element.data[4],
+            ].join(' | '));
+        } else if(element.componentSubType == "bar") {
+            rs.push([
+                element.seriesName + ': ' + element.data[1],
+            ].join(' | '));
+        }
+        
+    }
+    if(color != null) return '<span style="color:'+color+'">'+rs.join('<br>')+'</span>';
+    return rs.join('<br>');
+}
+
+
+(function($) {
+    echarts.registerTransform(kline_stream_tranform.kline);
+    echarts.registerTransform(kline_stream_tranform.volume);
+    echarts.registerTransform(kline_stream_tranform.trades);
+    echarts_obj = echarts.init( document.getElementById('graf'), 'dark', { renderer: 'canvas', useDirtyRect: false } );
+    echarts_obj.setOption({
+                animation: false,
+                legend: { bottom: 10, left: 'center' },
+                tooltip: {
+                    show: true,
+                    trigger: 'axis',
+                    
+                    formatter: (params) => { return tooltip_formating(params); },
+                    axisPointer: {
+                        type: 'cross'
+                    },
+                    backgroundColor: 'rgba(245, 245, 245, 0.0)',
+                    borderWidth: 0,
+                    textStyle: {
+                        color: '#FFF',
+                        fontSize: 12
+                    },
+                    position: { top: 10, left: 10 },
+                    // extraCssText: 'width: 170px'
+                },
+                // axisPointer: { link: [ { xAxisIndex: 'all' } ], label: { backgroundColor: '#777' } },
+                // toolbox: { feature: { dataZoom: { yAxisIndex: false }, brush: { type: ['lineX', 'clear'] } } },
+                // brush: { xAxisIndex: 'all', brushLink: 'all', outOfBrush: { colorAlpha: 0.1 } },
+                grid: [ 
+                    { id:"grid_default_precio",  left: '0%', right: '5%', top: '0%',  height: '83%', containLabel: false, },
+                    { id:"grid_default_volumen", left: '0%', right: '5%', top: '73%', height: '10%', containLabel: false, },
+                ],
+                xAxis: [
+                    // { id:"default_time_1", type: 'time', gridId:"grid_default_precio",  boundaryGap: false, axisLine: { onZero: false },                            splitLine: { show: false },                             min: 'dataMin', max: 'dataMax', axisPointer: { z: 100 } },
+                    // { id:"default_time_2", type: 'time', gridId:"grid_default_volumen", boundaryGap: false, axisLine: { onZero: false }, axisTick: { show: false }, splitLine: { show: false }, axisLabel: { show: false }, min: 'dataMin', max: 'dataMax' }
+                    { id:"default_time_1", type: 'time', gridId:"grid_default_precio",  boundaryGap: false, axisLine: { onZero: false }, splitLine: { show: false }, min: 'dataMin', max: 'dataMax', },
+                    { id:"default_time_2", type: 'time', gridId:"grid_default_volumen", boundaryGap: false, axisLine: { onZero: false }, splitLine: { show: false }, min: 'dataMin', max: 'dataMax', }
+
+                ],
+                yAxis: [ 
+                    { 
+                        id: "graf_precio", 
+                        name:"P", 
+                        gridId: "grid_default_precio", 
+                        type:"value",
+                        scale: true, 
+                        splitArea: { show: true },
+                        position: 'right',
+                        min: (v) => { return v.min - (v.max - v.min) * 0.2; },
+                        max: (v) => { return v.max + (v.max - v.min) * 0.2; },
+                        //interval: (v) => { return (v.max - v.min) / 5; },
+                    },
+                    { 
+                        id: "graf_volume", 
+                        name:"V", 
+                        type:"value", 
+                        gridId: "grid_default_volumen", 
+                        scale: true, 
+                        splitArea: { show: true },
+                        position: 'right',
+                        min: (v) => { return v.min - (v.max - v.min) * 0.2; },
+                        max: (v) => { return v.max + (v.max - v.min) * 0.2; },
+                    },
+                ],
+                dataZoom: [
+                    { id: 'dataZoomXInside', type: 'inside', xAxisId: ["default_time_1","default_time_2"], show: true,          start: 0, end: 100 }, 
+                    { id: 'dataZoomXSlider', type: 'slider', xAxisId: ["default_time_1","default_time_2"], top: '95%',          start: 0, end: 100 },
+                    { id: 'dataZoomYInside', type: 'inside', yAxisId: ["2"],   show: true,          start: 10, end: 90 }, 
+                    { id: 'dataZoomYSlider', type: 'slider', yAxisId: ["2"], start: 10, end: 90 },
+                ],
+                series: [
+                    {
+                        id: '_serie_precio',
+                        name: 'Precio', 
+                        type: 'candlestick', 
+                        datasetId: "candle",
+                        xAxisId: "default_time_1",
+                        yAxisId: "graf_precio",
+
+                    },
+                    {
+                        id: '_serie_precio2',
+                        name: 'Precio', 
+                        type: 'candlestick', 
+                        datasetId: "candle2",
+                        xAxisId: "default_time_1",
+                        yAxisId: "graf_precio",
+
+                    },
+                    { 
+                        id: '_serie_volume',
+                        name: 'Volume', 
+                        type: 'bar', 
+                        xAxisId: "default_time_2",
+                        yAxisId: "graf_volume",
+                        datasetId: "volume",
+                        
+                    },
+                ],
+                dataset: [
+                    { 
+                        id:"kline_stream", 
+                        sourceHeader: false,
+                        source: [], 
+                        dimensions:[
+                                { name: "time_open",          type:"time" },
+                                { name: "time_close",         type:"time" },
+                                { name: "symbol",             type:"ordinal" },
+                                { name: "interval",           type:"ordinal" },
+                                { name: "trade_first_id",     type:"number" },
+                                { name: "trade_last_id",      type:"number" },
+                                { name: "price_open",         type:"float" },
+                                { name: "price_close",        type:"float" },
+                                { name: "price_high",         type:"float" },
+                                { name: "price_low",          type:"float" },
+                                { name: "volume_base",        type:"float" },    // Base asset volume
+                                { name: "trade_count",        type:"int" },
+                                { name: "has_candle_close",   type:"ordinal" },
+                                { name: "volume_quote",       type:"float" },    // Quote asset volume
+                                { name: "volume_base_taker",  type:"float" },    // Taker buy base asset volume
+                                { name: "volume_quote_taker", type:"float" },    // Taker buy quote asset volume
+                                null,
+                        ]
+                    },
+                    { 
+                        id:"kline_stream2", 
+                        sourceHeader: false,
+                        source: [], 
+                        dimensions:[
+                                { name: "time_open",          type:"time" },
+                                { name: "time_close",         type:"time" },
+                                { name: "symbol",             type:"ordinal" },
+                                { name: "interval",           type:"ordinal" },
+                                { name: "trade_first_id",     type:"number" },
+                                { name: "trade_last_id",      type:"number" },
+                                { name: "price_open",         type:"float" },
+                                { name: "price_close",        type:"float" },
+                                { name: "price_high",         type:"float" },
+                                { name: "price_low",          type:"float" },
+                                { name: "volume_base",        type:"float" },    // Base asset volume
+                                { name: "trade_count",        type:"int" },
+                                { name: "has_candle_close",   type:"ordinal" },
+                                { name: "volume_quote",       type:"float" },    // Quote asset volume
+                                { name: "volume_base_taker",  type:"float" },    // Taker buy base asset volume
+                                { name: "volume_quote_taker", type:"float" },    // Taker buy quote asset volume
+                                null,
+                        ]
+                    },
+
+                    { 
+                        id:"volume", 
+                        fromDatasetId: "kline_stream",
+                        transform: { 
+                            type: 'kline_stream:volume', 
+                            config: { },
+                            print: true
+                        },
+                        
+                    },
+                    { 
+                        id:"candle", 
+                        fromDatasetId: "kline_stream",
+                        transform: { 
+                            type: 'kline_stream:kline', 
+                            config: { },
+                            print: true
+                        },
+                        
+                    },
+                    { 
+                        id:"candle2", 
+                        fromDatasetId: "kline_stream2",
+                        transform: { 
+                            type: 'kline_stream:kline', 
+                            config: { },
+                            print: true
+                        },
+                        
+                    },
+                    { 
+                        id:"", 
+                        source:[], 
+                        dimensions:[]
+                    },
+                ],
+                visualMap: [],
+            });
+
+    $.ajax({
+        url: '/static/test/dataklines.json',
+        dataType: 'json',
+        success: (ds) => {
+            let rs = [];
+            for(let i=0; i<ds.length; i++){
+                rs.push({
+                    "t": ds[i][0], // Kline start time
+                    "T": ds[i][6], // Kline close time
+                    "s": "BTCUSDT",  // Symbol
+                    "i": "1m",      // Interval
+                    "f": 0,       // First trade ID
+                    "L": 0,       // Last trade ID
+                    "o": ds[i][1],  // Open price
+                    "c": ds[i][4],  // Close price
+                    "h": ds[i][2],  // High price
+                    "l": ds[i][3],  // Low price
+                    "v": ds[i][5],    // Base asset volume
+                    "n": ds[i][8],       // Number of trades
+                    "x": true,     // Is this kline closed?
+                    "q": ds[i][7],  // Quote asset volume
+                    "V": ds[i][8],     // Taker buy base asset volume
+                    "Q": ds[i][9],   // Taker buy quote asset volume
+                    "B": ds[i][10]   // Ignore
+                });
+            }
+            let rs2 = [];
+            for(let i=0; i<ds.length; i++){
+                rs2.push({
+                    "t": ds[i][0], // Kline start time
+                    "T": ds[i][6], // Kline close time
+                    "s": "BTCUSDT",  // Symbol
+                    "i": "1m",      // Interval
+                    "f": 0,       // First trade ID
+                    "L": 0,       // Last trade ID
+                    "o": parseFloat(ds[i][1])+100,  // Open price
+                    "c": parseFloat(ds[i][4])+100,  // Close price
+                    "h": parseFloat(ds[i][2])+100,  // High price
+                    "l": parseFloat(ds[i][3])+100,  // Low price
+                    "v": ds[i][5],    // Base asset volume
+                    "n": ds[i][8],       // Number of trades
+                    "x": true,     // Is this kline closed?
+                    "q": ds[i][7],  // Quote asset volume
+                    "V": ds[i][8],     // Taker buy base asset volume
+                    "Q": ds[i][9],   // Taker buy quote asset volume
+                    "B": ds[i][10]   // Ignore
+                });
+            }
+
+
+            echarts_obj.setOption({
+                'dataset': [
+                    { 
+                        id:"kline_stream", 
+                        sourceHeader: false,
+                        source: rs, 
+                        dimensions:[
+                                { name: "time_open",          type:"time" },
+                                { name: "time_close",         type:"time" },
+                                { name: "symbol",             type:"ordinal" },
+                                { name: "interval",           type:"ordinal" },
+                                { name: "trade_first_id",     type:"number" },
+                                { name: "trade_last_id",      type:"number" },
+                                { name: "price_open",         type:"float" },
+                                { name: "price_close",        type:"float" },
+                                { name: "price_high",         type:"float" },
+                                { name: "price_low",          type:"float" },
+                                { name: "volume_base",        type:"float" },    // Base asset volume
+                                { name: "trade_count",        type:"int" },
+                                { name: "has_candle_close",   type:"ordinal" },
+                                { name: "volume_quote",       type:"float" },    // Quote asset volume
+                                { name: "volume_base_taker",  type:"float" },    // Taker buy base asset volume
+                                { name: "volume_quote_taker", type:"float" },    // Taker buy quote asset volume
+                                null,
+                        ]
+                    },                    
+                    { 
+                        id:"kline_stream2", 
+                        sourceHeader: false,
+                        source: rs2, 
+                        dimensions:[
+                                { name: "time_open",          type:"time" },
+                                { name: "time_close",         type:"time" },
+                                { name: "symbol",             type:"ordinal" },
+                                { name: "interval",           type:"ordinal" },
+                                { name: "trade_first_id",     type:"number" },
+                                { name: "trade_last_id",      type:"number" },
+                                { name: "price_open",         type:"float" },
+                                { name: "price_close",        type:"float" },
+                                { name: "price_high",         type:"float" },
+                                { name: "price_low",          type:"float" },
+                                { name: "volume_base",        type:"float" },    // Base asset volume
+                                { name: "trade_count",        type:"int" },
+                                { name: "has_candle_close",   type:"ordinal" },
+                                { name: "volume_quote",       type:"float" },    // Quote asset volume
+                                { name: "volume_base_taker",  type:"float" },    // Taker buy base asset volume
+                                { name: "volume_quote_taker", type:"float" },    // Taker buy quote asset volume
+                                null,
+                        ]
+                    },                    
+
+                ]
+            }, );
+
+        },
+        
+    });
+
+    
+})(jQuery)
+
+</script>
+
+
+
+    </body>
+</html>
