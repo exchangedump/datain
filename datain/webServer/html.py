@@ -14,3 +14,8 @@ class html(BaseWebServer):
         @self.router.get("/clients")
         async def cliente() -> HTMLResponse:
             return self.HTMLResponseFile('datain/webServer/html/client.html')
+
+        @self.router.get("/testGraf")
+        async def clientasde() -> HTMLResponse:
+            return self.HTMLResponseFile('datain/webServer/html/graf.html')
+
