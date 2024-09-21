@@ -12,7 +12,6 @@ from datain.wsOutput.wsControl import wsControl
 from datain.webServer.subscribe import subscribe as subscribeWebServer
 from datain.webServer.status import status as statusWebServer
 from datain.webServer.output import output as wsOutputWebServer
-from datain.webServer.html import html as htmlWebServer
 from datain.webServer.control import control as controlWebServer
 
 
