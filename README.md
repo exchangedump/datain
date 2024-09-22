@@ -121,7 +121,7 @@ client.control_stop()
 
 ### 7. Conectar al websocket
 
-....
+....@TODO
 
 ## Test
 El proyecto utiliza pytest para las pruebas. Para ejecutar los tests:
