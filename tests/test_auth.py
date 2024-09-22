@@ -2,7 +2,6 @@ import pytest
 import requests
 import os
 from dotenv import load_dotenv
-from pprint import pprint
 
 load_dotenv()
 
