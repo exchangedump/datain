@@ -4,6 +4,10 @@ from datain.webServer.utils.BaseWebServer import BaseWebServer
 from datain.webServer.utils.BaseResponseModel import ResponseErrorModel
 from datain.webServer.models.response.status import statusOk as statusResponse
 
+from datain.webServer.models.response.auth import User
+from typing_extensions import Annotated
+from fastapi import Depends
+from datain.webServer.utils.authUtils import is_active
 
 class status(BaseWebServer):
 
@@ -12,7 +16,7 @@ class status(BaseWebServer):
         self.inputStream = inputStream
         
         @self.router.post("/status")
-        async def status() -> statusResponse | ResponseErrorModel:
+        async def status(current_user: Annotated[User, Depends(is_active)]) -> statusResponse | ResponseErrorModel:
             
             try:
                 self.inputStream

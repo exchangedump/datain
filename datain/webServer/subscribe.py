@@ -9,6 +9,10 @@ from datain.webServer.models.request.unsubscribe import unsubscribe as unsubscri
 from datain.webServer.models.response.unsubscribe import unsubscribeOk as unsubscribeOkResponse
 from datain.webServer.models.response.unsubscribe import unsubscribeError as unsubscribeErrorResponse
 
+from datain.webServer.models.response.auth import User
+from typing_extensions import Annotated
+from fastapi import Depends
+from datain.webServer.utils.authUtils import is_active
 
 class subscribe(BaseWebServer):
 
@@ -17,7 +21,7 @@ class subscribe(BaseWebServer):
         self.inputStream = inputStream
         
         @self.router.post("/subscribe")
-        async def subscribe( data: subscribeRequest ) -> subscribeOkResponse | subscribeErrorResponse:
+        async def subscribe( data: subscribeRequest, current_user: Annotated[User, Depends(is_active)] ) -> subscribeOkResponse | subscribeErrorResponse:
             
             try:
                 self.inputStream.subscribe(
@@ -29,7 +33,7 @@ class subscribe(BaseWebServer):
                 return subscribeErrorResponse(id=data.id, errorRef='subscribe:1', errorText=str(e))
 
         @self.router.post("/unsubscribe")
-        async def unsubscribe( data: unsubscribeRequest ) -> unsubscribeOkResponse | unsubscribeErrorResponse:
+        async def unsubscribe( data: unsubscribeRequest, current_user: Annotated[User, Depends(is_active)], ) -> unsubscribeOkResponse | unsubscribeErrorResponse:
             
             try:
                 self.inputStream.unsubscribe(
